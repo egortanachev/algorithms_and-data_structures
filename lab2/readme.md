@@ -13,3 +13,11 @@
 ### Задание 3
 
 Придумать и реализовать алгоритмы, имеющие сложность $ O(3n) $, $ O(nlogn) $, $ O(n!) $, $ O(n^3) $, $ O(3log(n)) $
+
+var md = require('markdown-it')(),
+    mathjax3 = require('markdown-it-mathjax3');
+
+md.use(mathjax3);
+
+// double backslash is required for javascript strings, but not html input
+var result = md.render('# Math Rulez! \n  $\\sqrt{3x-1}+(1+x)^2$');
