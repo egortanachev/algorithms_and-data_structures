@@ -142,3 +142,47 @@ print('Сумма все возможных комбинации троек чи
 ```
 
 > В этой программе мы используем три вложенных цикла $for$ для итерации через массив. Внешний цикл выполняется n раз, средний цикл выполняется $n-1$ раз (так как он начинается со второго элемента), а внутренний цикл также выполняется $n-2$ раза. Таким образом, общая сложность этого алгоритма составляет $O(3n)$.
+
+
+#### Алгоритм со сложностью $О(n \cdot log n)$ (Сортировка слиянием)
+```
+def merge_sort(arr):
+    if len(arr) > 1:
+        mid = len(arr) // 2
+        left_half = arr[:mid]
+        right_half = arr[mid:]
+
+        merge_sort(left_half)
+        merge_sort(right_half)
+
+        i = j = k = 0
+
+        while i < len(left_half) and j < len(right_half):
+            if left_half[i] < right_half[j]:
+                arr[k] = left_half[i]
+                i += 1
+            else:
+                arr[k] = right_half[j]
+                j += 1
+            k += 1
+
+        while i < len(left_half):
+            arr[k] = left_half[i]
+            i += 1
+            k += 1
+
+        while j < len(right_half):
+            arr[k] = right_half[j]
+            j += 1
+            k += 1
+
+    return arr
+
+arr = [6, 5, 3, 4, 8, 0, 10, 100, 20, 14]
+print('Изначальный массив:', arr)
+
+result = merge_sort(arr)
+print('Отсортированный массив:', result)
+```
+
+>Эта программа использует рекурсивный подход к сортировке массива. Общая сложность данной программы - $O(n \cdot log n)$, так как каждый уровень рекурсии имеет сложность $O(n)$, а глубина рекурсии - $O(log n)$.
