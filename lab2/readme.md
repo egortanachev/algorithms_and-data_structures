@@ -46,7 +46,7 @@ value = 67
 
 result = binary_search(arr, value)
 if result[0]:
-    print(result[1])
+    print('Найденное число -', result[1])
 else:
     print('Не найден')
 ```
@@ -66,7 +66,7 @@ def sum_of_pairs(arr):
 
 arr = [10, 23, 1, 32, 5, 7, 9, 12, 72]
 result = sum_of_pairs(arr)
-print(result)
+print(print('Сумма всех возможных пар элементов -', result))
 ```
 
 > Количество элементов - 10, количество шагов для алгоритма - 100
@@ -82,7 +82,7 @@ def fibonacci(n):
 
 n = 10
 result = fibonacci(n)
-print(result)
+print('Число Фибоначчи под номером 10 -', result)
 ```
 
 > Значение элемента - 5, количество шагов для алгоритма - 32
