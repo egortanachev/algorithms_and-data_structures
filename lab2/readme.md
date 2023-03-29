@@ -11,3 +11,7 @@
 ##### Задание 3
 
 Придумать и реализовать алгоритмы, имеющие сложность $ O(3n) $, $ O(nlogn) $, $ O(n!) $, $ O(n^3) $, $ O(3log(n)) $
+
+<script type="text/javascript"
+  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
