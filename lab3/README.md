@@ -1,4 +1,4 @@
-## Лабороторная работа №3
+## Лабораторная работа №3
 
 ### Задание 1
 
@@ -68,7 +68,47 @@ print("Время выполнения:", time)
 
 Изучить блочную, пирамидальную и сортировку слиянием. Написать соответствующие программы.
 
-#### Программа
+#### Блочная сортировка
+
+```
+import timeit
+
+def bucket_sort(arr):
+    min_val = min(arr)
+    max_val = max(arr)
+    bucket_range = max_val - min_val + 1
+    buckets = []
+    for i in range(bucket_range):
+        buckets.append([])
+    for num in arr:
+        buckets[num - min_val].append(num)
+    sorted_arr = []
+    for bucket in buckets:
+        sorted_arr += sorted(bucket)
+    return sorted_arr
+
+arr = [10, 7, 8, 9, 1, 5]
+print("Неотсортированный массив:", arr)
+sorted_arr = bucket_sort(arr)
+print("Отсортированный массив:", sorted_arr)
+
+# Оценка времени выполнения функции
+time = timeit.timeit(lambda: bucket_sort(arr), number=100)
+print("Время выполнения:", time)
+```
+
+> Время выполнения: 0.0005160080000000053
+
+#### Пирамидная сортировка
+
+```
+Код
+```
+
+> Описание
+
+
+#### Сортировка слиянием
 
 ```
 Код
