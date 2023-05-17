@@ -7,6 +7,7 @@
 #### Создание массива из 500 простых чисел
 
 ```
+# Функция для проверки, является ли число простым
 def is_prime(n):
     if n <= 1:
         return False
@@ -15,14 +16,24 @@ def is_prime(n):
             return False
     return True
 
+# Создаем массив из 500 простых чисел, записанных слитно
 primes = []
-n = 2
+num = 2
 while len(primes) < 500:
-    if is_prime(n):
-        primes.append(n)
-    n += 1
+    if is_prime(num):
+        primes.append(num)
+    num += 1
+prime_str = "".join(str(p) for p in primes)
 
-prime_string = ''.join(map(str, primes))
+# Инициализируем словарь для хранения количества двузначных чисел
+counts = {}
+for i in range(len(prime_str)-1):
+    num = int(prime_str[i:i+2])
+    if 10 <= num <= 99:
+        if num in counts:
+            counts[num] += 1
+        else:
+            counts[num] = 1
 ```
 
 > Описание
@@ -30,24 +41,13 @@ prime_string = ''.join(map(str, primes))
 #### Наивный алгоритм
 
 ```
-def find_most_common(prime_string):
-    count = {}
-    for i in range(len(prime_string) - 1):
-        num = int(prime_string[i:i+2])
-        if num not in count:
-            count[num] = 0
-        count[num] += 1
-
-    max_count = max(count.values())
-    most_common = [num for num in count if count[num] == max_count]
-
-    return {"most_common": most_common, "count": count}
-
-result = find_most_common(prime_string)
-
-print("Наиболее часто встречающиеся двузначные числа:")
-for num in result["most_common"]:
-    print(num, "встречается", result["count"][num], "раза")
+max_count = 0
+max_num = None
+for num, count in counts.items():
+    if count > max_count:
+        max_count = count
+        max_num = num
+print(f"Наиболее часто встречающееся двузначное число - {max_num}, встречается {max_count} раз(а).")
 ```
 
 > Описание
@@ -55,7 +55,23 @@ for num in result["most_common"]:
 #### Алгоритм Рабина-Карпа
 
 ```
-Код
+max_count = 0
+max_num = None
+for num, count in counts.items():
+    pattern = str(num)
+    pattern_len = len(pattern)
+    text_len = len(prime_str)
+    pattern_hash = hash(pattern)
+    text_hash = hash(prime_str[:pattern_len])
+    for i in range(text_len - pattern_len + 1):
+        if pattern_hash == text_hash and prime_str[i:i+pattern_len] == pattern:
+            if count > max_count:
+                max_count = count
+                max_num = num
+            break
+        if i < text_len - pattern_len:
+            text_hash = hash(prime_str[i+1:i+1+pattern_len])
+print(f"Наиболее часто встречающееся двузначное число - {max_num}, встречается {max_count} раз(а).")
 ```
 
 > Описание
@@ -63,7 +79,30 @@ for num in result["most_common"]:
 #### Алгоритм Бойера-Мура
 
 ```
-Код
+max_count = 0
+max_num = None
+for num, count in counts.items():
+    pattern = str(num)
+    pattern_len = len(pattern)
+    last_occurrence = {pattern[i]: i for i in range(pattern_len)}
+    i = pattern_len - 1
+    while i < len(prime_str):
+        if prime_str[i] == pattern[pattern_len-1]:
+            k = pattern_len - 2
+            j = i - 1
+            while k >= 0 and prime_str[j] == pattern[k]:
+                j -= 1
+                k -= 1
+            if k == -1:
+                if count > max_count:
+                    max_count = count
+                    max_num = num
+                break
+        if i == len(prime_str) - 1:
+            break
+        skip = pattern_len - last_occurrence.get(prime_str[i], -1) - 1
+        i += skip
+print(f"Наиболее часто встречающееся двузначное число - {max_num}, встречается {max_count} раз(а).")
 ```
 
 > Описание
@@ -71,7 +110,33 @@ for num in result["most_common"]:
 #### Алгоритм Кнута-Морриса-Пратта
 
 ```
-Код
+max_count = 0
+max_num = None
+for num, count in counts.items():
+    pattern = str(num)
+    pattern_len = len(pattern)
+    prefix_table = [0] * pattern_len
+    j = 0
+    for i in range(1, pattern_len):
+        while j > 0 and pattern[i] != pattern[j]:
+            j = prefix_table[j-1]
+        if pattern[i] == pattern[j]:
+            j += 1
+        prefix_table[i] = j
+    j = 0
+    for i in range(len(prime_str)):
+        while j > 0 and prime_str[i] != pattern[j]:
+            j = prefix_table[j-1]
+        if prime_str[i] == pattern[j]:
+            j += 1
+        if j == pattern_len:
+            if count > max_count:
+                max_count = count
+                max_num = num
+            break
+
+print("Наиболее часто встречающееся двузначное число:", max_num)
+print("Количество вхождений:", max_count)
 ```
 
 > Описание
@@ -146,7 +211,40 @@ for num in result["most_common"]:
 #### Решение
 
 ```
-Код
+import os
+import docx2txt
+
+# Открытие файлов с рефератами
+ref_files = os.listdir('ref/')
+ref_files = [f for f in ref_files if f.endswith('.docx')]
+
+# Открытие файлов со статьями из Википедии
+wiki_files = os.listdir('wiki/')
+wiki_files = [f for f in wiki_files if f.endswith('.txt')]
+
+# Итерация по каждому реферату
+for i, ref_file in enumerate(ref_files):
+    # Извлечение текста из реферата
+    ref_text = docx2txt.process(os.path.join('ref/', ref_file))
+    
+    # Определение соответствующего файла со статьей из Википедии
+    wiki_file = wiki_files[i]
+    
+    # Извлечение текста из статьи
+    with open(os.path.join('wiki/', wiki_file), 'r') as f:
+        wiki_text = f.read()
+    
+    # Применение алгоритма Rabin-Karp для поиска плагиата
+    plagiarism_count = 0
+    for word in ref_text.split():
+        if ' '.join(ref_text.split()[ref_text.split().index(word):ref_text.split().index(word)+3]) in wiki_text:
+            plagiarism_count += 1
+    
+    # Определение процента плагиата
+    plagiarism_percent = round(plagiarism_count / len(ref_text) * 100, 2)
+    
+    # Вывод результатов
+    print(f'{ref_file}: {plagiarism_percent}% plagiarism with {wiki_file}')
 ```
 
 > Описание
