@@ -36,8 +36,6 @@ for i in range(len(prime_str)-1):
             counts[num] = 1
 ```
 
-> Описание
-
 #### Наивный алгоритм
 
 ```
@@ -49,8 +47,6 @@ for num, count in counts.items():
         max_num = num
 print(f"Наиболее часто встречающееся двузначное число - {max_num}, встречается {max_count} раз(а).")
 ```
-
-> Описание
 
 #### Алгоритм Рабина-Карпа
 
@@ -73,8 +69,6 @@ for num, count in counts.items():
             text_hash = hash(prime_str[i+1:i+1+pattern_len])
 print(f"Наиболее часто встречающееся двузначное число - {max_num}, встречается {max_count} раз(а).")
 ```
-
-> Описание
 
 #### Алгоритм Бойера-Мура
 
@@ -104,8 +98,6 @@ for num, count in counts.items():
         i += skip
 print(f"Наиболее часто встречающееся двузначное число - {max_num}, встречается {max_count} раз(а).")
 ```
-
-> Описание
 
 #### Алгоритм Кнута-Морриса-Пратта
 
@@ -138,8 +130,6 @@ for num, count in counts.items():
 print("Наиболее часто встречающееся двузначное число:", max_num)
 print("Количество вхождений:", max_count)
 ```
-
-> Описание
 
 ### Сравнение алгоритмов
 
@@ -211,43 +201,64 @@ print("Количество вхождений:", max_count)
 #### Решение
 
 ```
-import os
-import docx2txt
+from methods import KMP
+import wikipedia
+import pypandoc
 
-# Открытие файлов с рефератами
-ref_files = os.listdir('ref/')
-ref_files = [f for f in ref_files if f.endswith('.docx')]
+def delcp(x):
+    arr = ",<>.[]?!/*&^%$@()_-=+:;"
+    for i in arr:
+        x = x.replace(i, ' ')
+    while "  " in x:
+        x = x.replace("  ", " ")
+    return x
 
-# Открытие файлов со статьями из Википедии
-wiki_files = os.listdir('wiki/')
-wiki_files = [f for f in wiki_files if f.endswith('.txt')]
+def get_unique_trigrams(text):
+    text = delcp(text.lower())
+    words = text.split()
+    unique_trigrams = []
+    for i in range(len(words) - 2):
+        trigram = (words[i], words[i+1], words[i+2])
+        if trigram not in unique_trigrams:
+            unique_trigrams.append(trigram)
+    return unique_trigrams
 
-# Итерация по каждому реферату
-for i, ref_file in enumerate(ref_files):
-    # Извлечение текста из реферата
-    ref_text = docx2txt.process(os.path.join('ref/', ref_file))
-    
-    # Определение соответствующего файла со статьей из Википедии
-    wiki_file = wiki_files[i]
-    
-    # Извлечение текста из статьи
-    with open(os.path.join('wiki/', wiki_file), 'r') as f:
-        wiki_text = f.read()
-    
-    # Применение алгоритма Rabin-Karp для поиска плагиата
-    plagiarism_count = 0
-    for word in ref_text.split():
-        if ' '.join(ref_text.split()[ref_text.split().index(word):ref_text.split().index(word)+3]) in wiki_text:
-            plagiarism_count += 1
-    
-    # Определение процента плагиата
-    plagiarism_percent = round(plagiarism_count / len(ref_text) * 100, 2)
-    
-    # Вывод результатов
-    print(f'{ref_file}: {plagiarism_percent}% plagiarism with {wiki_file}')
+# Преобразовать текст из docx в txt
+essay = pypandoc.convert_file('Улыбка.docx', 'plain').lower()
+essay = delcp(essay)
+
+# Получите уникальные триграммы в эссе
+mainset = get_unique_trigrams(essay)
+
+wikipedia.set_lang("ru")
+origin = wikipedia.page("Улыбка").content.lower()
+origin = delcp(origin)
+
+# Получите уникальные триграммы в содержимом страницы Википедии
+patternset = get_unique_trigrams(origin)
+
+# Вычислить словарь вхождений триграмм и количество символов
+trigram_dict = {}
+for pattern in patternset:
+    trigram = ' '.join(pattern)
+    trigram_dict[trigram] = (KMP(mainset, pattern) * len(trigram), len(pattern[0]) + 1, len(pattern[1]) + 1, len(pattern[2]))
+
+k = 0
+dict_values = list(trigram_dict.values())
+last = dict_values[0]
+k = last[0]
+
+# Исключить случай, когда "ABCD" считается плагиатом "ABC" и "BCD".
+for j in range(1, len(dict_values)):
+    if last[0] != 0:
+        k += (dict_values[j][0] - (last[1] + last[2] + 1))
+    else:
+        k += dict_values[j][0]
+    last = dict_values[j]
+
+plagiarism_percentage = k / len(essay) * 100
+print(plagiarism_percentage, "%")
 ```
-
-> Описание
 
 ### Защита работы
 
