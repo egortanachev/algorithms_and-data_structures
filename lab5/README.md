@@ -15,10 +15,10 @@ def stolen_items(items, M, K):
 
     # Проходимся по каждому экспонату, начиная с самого ценного
     for item in sorted_items:
-        if item[0] <= M * K:
+        if item[0] <= K and M > 0:
             stolen_items.append(item)
             total_value += item[1]
-            M -= (item[0] // K)
+            M -= 1
 
     return stolen_items, total_value
 
