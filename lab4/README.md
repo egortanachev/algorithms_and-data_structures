@@ -224,14 +224,14 @@ def get_unique_trigrams(text):
     return unique_trigrams
 
 # Преобразовать текст из docx в txt
-essay = pypandoc.convert_file('Улыбка.docx', 'plain').lower()
+essay = pypandoc.convert_file('Корпоративные ценности.docx', 'plain').lower()
 essay = delcp(essay)
 
 # Получите уникальные триграммы в эссе
 mainset = get_unique_trigrams(essay)
 
 wikipedia.set_lang("ru")
-origin = wikipedia.page("Улыбка").content.lower()
+origin = wikipedia.page("Корпоративные ценности").content.lower()
 origin = delcp(origin)
 
 # Получите уникальные триграммы в содержимом страницы Википедии
@@ -247,15 +247,4 @@ k = 0
 dict_values = list(trigram_dict.values())
 last = dict_values[0]
 k = last[0]
-
-# Исключить случай, когда "ABCD" считается плагиатом "ABC" и "BCD".
-for j in range(1, len(dict_values)):
-    if last[0] != 0:
-        k += (dict_values[j][0] - (last[1] + last[2] + 1))
-    else:
-        k += dict_values[j][0]
-    last = dict_values[j]
-
-plagiarism_percentage = k / len(essay) * 100
-print(plagiarism_percentage, "%")
 ```
