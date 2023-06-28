@@ -7,35 +7,54 @@
 #### Решение
 
 ```
-def stolen_items(items, M, K):
-    # Сортируем экспонаты по их ценности
-    sorted_items = sorted(items, key=lambda x: x[1], reverse=True)
+def get_max_values_one_attempt(items, K=7):
+    N = len(items)
+    max_values = [[0 for j in range(K+1)] for i in range(N+1)]
+
+    for i in range(1, N+1):
+        for j in range(1, K+1):
+            if items[i-1][0] > j:
+                max_values[i][j] = max_values[i-1][j]
+            else:
+                max_values[i][j] = max(max_values[i-1][j], max_values[i-1][j-items[i-1][0]] + items[i-1][1])
+
     stolen_items = []
+    i = N
+    j = K
+
+    while i > 0 and j > 0:
+        if max_values[i][j] != max_values[i-1][j]:
+            stolen_items.append(i-1)
+            j -= items[i-1][0]
+        i -= 1
+
+    return max_values[N][K], [items[i] for i in stolen_items]
+
+def backpack_problem(items, K=7, M=2):
+    result = []
+    for _ in range(M):
+        new_items = get_max_values_one_attempt(items, K)[1]
+        if not len(new_items):
+            break
+        result.append(new_items)
+        items = list(set(items).difference(set(new_items)))
+    return result
+
+def print_result(result):
     total_value = 0
+    total_weight = 0
+    attempts = 0
+    for i, attempt in enumerate(result):
+        weight = sum([i[0] for i in attempt])
+        value = sum([i[1] for i in attempt])
+        total_weight += weight
+        total_value += value
+        attempts += 1
+    print(f"В общем украдено {total_weight}кг на {total_value} у. е. за {attempts} захода")
 
-    # Проходимся по каждому экспонату, начиная с самого ценного
-    for item in sorted_items:
-        if item[0] <= K and M > 0:
-            stolen_items.append(item)
-            total_value += item[1]
-            M -= 1
-
-    return stolen_items, total_value
-
-items = [(3, 50), (2, 30), (1, 20), (4, 60), (5, 70)]
-M = 3
-K = 5
-
-stolen, value = stolen_items(items, M, K)
-
-print("Украденные экспонаты: ", stolen)
-print("Общая ценность украденных экспонатов: ", value)
+items = [(2, 1000), (3, 120), (5, 250), (6, 320), (10, 10000000)]
+print_result(backpack_problem(items, 6, 10))
 ```
-
-> 1. Сортируем экспонаты по их ценности (от большей к меньшей).
-> 2. Проходимся по каждому экспонату, начиная с самого ценного.
-> 3. Если его вес не превышает оставшееся количество кг, которое может унести вор, то добавляем его в список украденных экспонатов и вычитаем его вес из оставшегося количества кг.
-> 4. Если же его вес превышает оставшееся количество кг, то переходим к следующему экспонату.
 
 ### Задание 2
 
